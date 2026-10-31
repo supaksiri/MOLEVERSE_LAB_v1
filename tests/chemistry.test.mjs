@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {AVOGADRO,SUBSTANCES,gramsToMoles,molesToParticles,equivalent,makeDominoSet,validateDominoSet,GAME_MASSES} from '../src/chemistry.js';
+test('18.015 g H2O equals 1 mol',()=>assert.ok(Math.abs(gramsToMoles(18.015,18.015)-1)<1e-12));
+test('one mole is Avogadro particles',()=>assert.equal(molesToParticles(1),AVOGADRO));
+test('reject negative mass and invalid molar mass',()=>{assert.throws(()=>gramsToMoles(-1,18));assert.throws(()=>gramsToMoles(3,0))});
+test('all atomic entities identified correctly',()=>{assert.equal(SUBSTANCES.find(x=>x.id==='nacl').entity,'หน่วยสูตร');assert.equal(SUBSTANCES.find(x=>x.id==='water').entity,'โมเลกุล')});
+test('game uses consistent rounded masses',()=>{assert.equal(GAME_MASSES.water*1,18);assert.equal(GAME_MASSES.co2*.5,22)});
+test('only same chemical species and amount are equivalent',()=>{assert.ok(equivalent({substance:'water',mol:1},{substance:'water',mol:1}));assert.equal(equivalent({substance:'water',mol:1},{substance:'co2',mol:1}),false)});
+test('all domino cards make solvable closed chain',()=>{const cards=makeDominoSet();assert.equal(cards.length,7);assert.ok(validateDominoSet(cards))});
+test('tampered domino chain is rejected',()=>{const cards=makeDominoSet();cards[2].left.mol=4;assert.equal(validateDominoSet(cards),false)});
